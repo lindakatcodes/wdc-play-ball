@@ -1,16 +1,15 @@
 ---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import TeamPicker from "../components/TeamPicker.vue";
+import { GET } from "./api/getTeams.ts";
 
+let teamsResponse = await GET(Astro);
+const teamsData = await teamsResponse.json();
+const teamsList = teamsData.teamsList;
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout>
+  <TeamPicker client:only="vue" teamsList={teamsList} />
+</BaseLayout>
+
+<style></style>
