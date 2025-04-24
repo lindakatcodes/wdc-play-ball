@@ -21,7 +21,6 @@ function addTeam(event) {
     // Team doesn't exist, so add it
     $selectedTeams.set([...selectedTeams.value, teamValue]);
   }
-  console.log("Updated selected teams:", selectedTeams.value);
 }
 </script>
 
@@ -44,4 +43,42 @@ function addTeam(event) {
   </div>
 </template>
 
-<style></style>
+<style scoped>
+  div {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 2rem;
+    gap: 0.5rem;
+    border-bottom: 4px solid black;
+  }
+
+  label {
+    text-align: center;
+    font-size: 1.125rem;
+    font-weight: 500;
+  }
+
+  select {
+    margin: 0 auto;
+  }
+
+  ul {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    list-style-type: none;
+    padding-inline-start: 0;
+  }
+
+  li {
+    font-weight: 600;
+    padding: 0.125rem 0.375rem;
+    border: 2px solid;
+    border-radius: 3px;
+    border-color: var(--red);
+  }
+
+  li:nth-child(even) {
+    border-color: var(--blue);
+  }
+</style>
