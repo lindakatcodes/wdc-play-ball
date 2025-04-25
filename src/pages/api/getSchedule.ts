@@ -1,4 +1,8 @@
 import type { APIContext } from "astro";
+import { parseJSON } from "date-fns";
+import { BASE_URL } from "astro:env/server";
+
+type DateRange = "today" | "next7" | "previous7" | "upcoming" | "previous";
 
 interface Game {
   gameDate: string;
@@ -32,28 +36,37 @@ interface ScheduleData {
 interface TransformedGame {
   date: string;
   time: string;
-  awayTeam: number;
-  homeTeam: number;
+  awayTeam: string;
+  homeTeam: string;
   gameStatus: string;
   awayScore: number | null;
   homeScore: number | null;
 }
-
-type DateRange = "today" | "next7" | "previous7" | "upcoming" | "previous";
 
 export const GET = async (context: APIContext): Promise<Response> => {
   // Get query parameters
   const url = context.url;
   const teamIds = url.searchParams.get("teamIds")?.split(",") || [];
   const dateRange = (url.searchParams.get("dateRange") || "today") as DateRange;
-  // Get timezone offset in minutes for conversion
-  const timezoneOffset = parseInt(
-    url.searchParams.get("timezoneOffset") || "0"
+
+  const teamsResponse = await fetch(new URL("/api/getTeams", url.origin)).then(
+    (res) => {
+      if (!res.ok) {
+        throw new Error(`Failed to fetch teams: ${res.status}`);
+      }
+      return res.json();
+    }
   );
 
-  // Base URL for the mock API
-  const baseUrl =
-    "https://fe1912ee-303a-4632-afe4-92071451c471.mock.pstmn.io/api/v1/schedule";
+  // Create a mapping of team IDs to abbreviations
+  const teamMap = new Map<number, string>();
+  teamsResponse.teamsList.forEach(
+    (team: { id: number; abbreviation: string }) => {
+      teamMap.set(team.id, team.abbreviation);
+    }
+  );
+
+  const baseUrl = `${BASE_URL}/api/v1/schedule`;
 
   // Calculate date parameters based on the requested range
   const today = new Date();
@@ -134,19 +147,22 @@ export const GET = async (context: APIContext): Promise<Response> => {
 
       gameDate.games.forEach((game: Game) => {
         // Convert date and time from UTC to local time
-        const { localDate, localTime } = convertToLocalDateTime(
-          game.gameDate,
-          timezoneOffset
-        );
+        const { localDate, localTime } = convertToLocalDateTime(game.gameDate);
 
         const currentGame = {
           date: localDate,
           time: localTime,
-          awayTeam: game.teams.away.team.id,
-          homeTeam: game.teams.home.team.id,
+          awayTeam: teamMap.get(game.teams.away.team.id) || "",
+          homeTeam: teamMap.get(game.teams.home.team.id) || "",
           gameStatus: game.status.abstractGameState,
-          awayScore: game.teams.away.score || null,
-          homeScore: game.teams.home.score || null,
+          awayScore:
+            game.teams.away.score != null && game.teams.away.score >= 0
+              ? game.teams.away.score
+              : null,
+          homeScore:
+            game.teams.home.score != null && game.teams.home.score >= 0
+              ? game.teams.home.score
+              : null,
         };
 
         totalGames.push(currentGame);
@@ -188,23 +204,21 @@ function formatDate(date: Date): string {
 }
 
 // Helper function to convert UTC date and time to local date and time
-function convertToLocalDateTime(
-  dateTimeStr: string,
-  timezoneOffset: number = 0
-): { localDate: string; localTime: string } {
-  // Parse the date and time strings from utc time to local time
-  const utcDate = new Date(dateTimeStr);
-  // For negative offsets we need to add minutes, for positive we subtract
-  const localDate = new Date(utcDate.getTime() + timezoneOffset * -1 * 60000);
-
-  const localDateStr = localDate.toISOString().split("T")[0];
-  const hours = localDate.getHours();
-  const minutes = localDate.getMinutes();
-  const timeOfDay = hours >= 12 ? "PM" : "AM";
-  const twelveHour = hours % 12 || 12;
-  const localTimeStr = `${twelveHour}:${minutes
-    .toString()
-    .padStart(2, "0")} ${timeOfDay}`;
+function convertToLocalDateTime(dateTimeStr: string): {
+  localDate: string;
+  localTime: string;
+} {
+  const dateObject = parseJSON(dateTimeStr);
+  const localDateStr = dateObject.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+  const localTimeStr = dateObject.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
 
   return {
     localDate: localDateStr,

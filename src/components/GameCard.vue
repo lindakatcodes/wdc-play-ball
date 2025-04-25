@@ -4,7 +4,15 @@ const props = defineProps(["game"]);
 
 <template>
   <div>
-    {{ props.game }}
+    <p>
+      <span>{{ game.awayTeam }}</span> @ <span>{{ game.homeTeam }}</span>
+    </p>
+    <p>Starts at {{ game.time }}</p>
+    <p v-if="game.gameStatus === 'Live'">LIVE NOW</p>
+    <p v-if="game.gameStatus === 'Final'">Final</p>
+     <div v-if="game.gameStatus === 'Final' || game.gameStatus === 'Live'">
+      {{ game.awayScore }} - {{ game.homeScore }}
+     </div>
   </div>
 </template>
 
