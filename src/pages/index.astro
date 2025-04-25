@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import TeamPicker from "../components/TeamPicker.vue";
+import GamesToday from "../components/GamesToday.vue";
 import { GET } from "./api/getTeams.ts";
 
 let teamsResponse = await GET(Astro);
@@ -10,6 +11,12 @@ const teamsList = teamsData.teamsList;
 
 <BaseLayout>
   <TeamPicker client:only="vue" teamsList={teamsList} />
+  <h2>Today's Games</h2>
+  <GamesToday client:only="vue" teamsList={teamsList} />
 </BaseLayout>
 
-<style></style>
+<style>
+  h2 {
+    text-align: center;
+  }
+</style>
