@@ -1,6 +1,6 @@
 import type { APIContext } from "astro";
 import { parseJSON } from "date-fns";
-import { BASE_URL } from "astro:env/server";
+import { BASE_URL, MOCK_URL } from "astro:env/server";
 
 type DateRange = "today" | "next7" | "previous7" | "upcoming" | "previous";
 
@@ -66,7 +66,7 @@ export const GET = async (context: APIContext): Promise<Response> => {
     }
   );
 
-  const baseUrl = `${BASE_URL}/api/v1/schedule`;
+  const baseUrl = `${MOCK_URL}/api/v1/schedule`;
 
   // Calculate date parameters based on the requested range
   const today = new Date();

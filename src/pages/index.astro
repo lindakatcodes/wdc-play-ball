@@ -1,8 +1,8 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import TeamPicker from "../components/TeamPicker.vue";
-import GamesToday from "../components/GamesToday.vue";
 import { GET } from "./api/getTeams.ts";
+import GamesList from "../components/GamesList.vue";
 
 let teamsResponse = await GET(Astro);
 const teamsData = await teamsResponse.json();
@@ -12,11 +12,26 @@ const teamsList = teamsData.teamsList;
 <BaseLayout>
   <TeamPicker client:only="vue" teamsList={teamsList} />
   <h2>Today's Games</h2>
-  <GamesToday client:only="vue" teamsList={teamsList} />
+  <GamesList client:only="vue" teamsList={teamsList} range="today" />
+  <h2>Upcoming Games</h2>
+  <GamesList client:only="vue" teamsList={teamsList} range="next7" />
+  <a href="/future-games">See all upcoming games</a>
+  <h2>Previous Games</h2>
+  <GamesList client:only="vue" teamsList={teamsList} range="prev7" />
+  <a href="/past-games">See all past games</a>
 </BaseLayout>
 
 <style>
   h2 {
     text-align: center;
+  }
+
+  a {
+    display: block;
+    text-align: center;
+    color: var(--blue);
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    font-size: 1.1rem;
   }
 </style>

@@ -1,0 +1,13 @@
+---
+import GamesList from "../components/GamesList.vue";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { GET } from "./api/getTeams.ts";
+
+let teamsResponse = await GET(Astro);
+const teamsData = await teamsResponse.json();
+const teamsList = teamsData.teamsList;
+---
+
+<BaseLayout>
+  <GamesList client:only="vue" teamsList={teamsList} range="previous" />
+</BaseLayout>
