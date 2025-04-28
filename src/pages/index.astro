@@ -12,7 +12,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   <GamesList client:only="vue" range="next7" />
   <a href="/future-games">See all upcoming games</a>
   <h2>Previous Games</h2>
-  <GamesList client:only="vue" range="prev7" />
+  <GamesList client:only="vue" range="prev7" reverseOrder={true} />
   <a href="/past-games">See all past games</a>
 </BaseLayout>
 

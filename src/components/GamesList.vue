@@ -4,7 +4,13 @@ import { useStore } from "@nanostores/vue";
 import { $selectedTeams, $teamsList, $teamIds, $hasTeams } from "../stores/teamStore";
 import GameCard from "./GameCard.vue";
 
-const props = defineProps(["range"]);
+const props = defineProps({
+  range: String,
+  reverseOrder: {
+    type: Boolean,
+    default: false
+  }
+});
 const selectedTeams = useStore($selectedTeams);
 const teamsList = useStore($teamsList);
 const teamIds = useStore($teamIds);
@@ -25,6 +31,17 @@ const gamesByDate = computed(() => {
     }
     groupedGames[dateKey].push(game);
   });
+
+  // If reverseOrder is true, sort dates in reverse chronological order
+  if (props.reverseOrder) {
+    const sortedGroupedGames = {};
+    Object.keys(groupedGames)
+      .sort((a, b) => new Date(b) - new Date(a))
+      .forEach(date => {
+        sortedGroupedGames[date] = groupedGames[date];
+      });
+    return sortedGroupedGames;
+  }
 
   return groupedGames;
 });
