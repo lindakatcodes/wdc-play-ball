@@ -12,7 +12,7 @@ interface ApiTeamResponse {
 }
 
 export const GET: APIRoute = async () => {
-  const teamsResponse = await fetch(`${MOCK_URL}/api/v1/teams?sportIds=1`).then(
+  const teamsResponse = await fetch(`${BASE_URL}/api/v1/teams?sportIds=1`).then(
     (res) => res.json()
   );
 

@@ -66,7 +66,7 @@ export const GET: APIRoute = async ({ url }): Promise<Response> => {
     }
   );
 
-  const baseUrl = `${MOCK_URL}/api/v1/schedule`;
+  const baseUrl = `${BASE_URL}/api/v1/schedule`;
 
   // Calculate date parameters based on the requested range
   const today = new Date();
