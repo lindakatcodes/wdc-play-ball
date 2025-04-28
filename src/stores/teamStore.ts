@@ -60,7 +60,11 @@ if (typeof window !== "undefined") {
           throw new Error("Invalid teams data format");
         }
 
-        $teamsList.set(data.teamsList || []);
+        const sortedTeams: Team[] = data.teamsList.sort((a: Team, b: Team) =>
+          (a.name ?? "").localeCompare(b.name ?? "")
+        );
+
+        $teamsList.set(sortedTeams || []);
       } catch (error) {
         console.error("Error fetching teams:", error);
         $error.set(error instanceof Error ? error.message : "Unknown error");
