@@ -19,6 +19,19 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 <style>
   h2 {
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  h2::before,
+  h2::after {
+    content: "";
+    height: 4px;
+    border-radius: 4px;
+    background-color: var(--red);
+    flex: 1;
   }
 
   a {
@@ -27,6 +40,6 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     color: var(--blue);
     margin-bottom: 0.75rem;
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 1.125rem;
   }
 </style>

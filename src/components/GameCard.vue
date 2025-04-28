@@ -33,7 +33,7 @@ article {
   align-items: center;
   gap: 0.75rem;
   padding: 0 0.5rem;
-  border-bottom: 2px solid black;
+  border-bottom: 1px solid black;
 }
 
 .teams {

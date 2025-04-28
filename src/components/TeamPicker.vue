@@ -35,7 +35,6 @@ div {
   flex-direction: column;
   padding: 0.5rem 2rem;
   gap: 0.5rem;
-  border-bottom: 4px solid black;
   margin-bottom: 0.75rem;
 }
 
@@ -47,6 +46,8 @@ label {
 
 select {
   margin: 0 auto;
+  padding: 0.25rem;
+  border: 2px solid var(--blue);
 }
 
 ul {

@@ -77,7 +77,7 @@ watch(
 
 .date {
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   padding-left: 0.25rem;
 }
 
