@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import { BASE_URL, MOCK_URL } from "astro:env/server";
 import { parseJSON } from "date-fns";
 
-type DateRange = "today" | "next7" | "previous7" | "upcoming" | "previous";
+type DateRange = "today" | "next7" | "prev7" | "upcoming" | "previous";
 type Status = "Final" | "Preview" | "Scheduled" | "Live";
 
 interface Game {
@@ -49,6 +49,7 @@ export const GET: APIRoute = async ({ url }): Promise<Response> => {
   const teamIds = url.searchParams.get("teamIds")?.split(",") || [];
   const dateRange = (url.searchParams.get("dateRange") || "today") as DateRange;
 
+  // right now this call has to be made here, since we can't access the client-side nanostore from our server-side api call
   const teamsResponse = await fetch(new URL("/api/getTeams", url.origin)).then(
     (res) => {
       if (!res.ok) {
@@ -84,7 +85,7 @@ export const GET: APIRoute = async ({ url }): Promise<Response> => {
       endDate = new Date(today);
       endDate.setDate(today.getDate() + 7);
       break;
-    case "previous7":
+    case "prev7":
       startDate = new Date(today);
       startDate.setDate(today.getDate() - 7);
       endDate = new Date(today);
@@ -96,7 +97,8 @@ export const GET: APIRoute = async ({ url }): Promise<Response> => {
       break;
     case "previous":
       startDate = new Date("2025-03-27");
-      endDate = today;
+      endDate = new Date(today);
+      endDate.setDate(today.getDate() - 1);
       break;
   }
 
