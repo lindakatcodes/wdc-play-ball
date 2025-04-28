@@ -1,33 +1,20 @@
-# Astro Starter Kit: Minimal
+# Play Ball!
 
-```sh
-npm create astro@latest -- --template minimal
-```
+An easy way to select your favorite MLB teams and see when their next game is!
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/minimal)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/minimal)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/minimal/devcontainer.json)
+Built for the Web Dev Challenge hackathon, season 2 episode 1.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+This site is built with Astro, Vue, and nanostores, and gets its data from the MLB stats API. It has an option to use Postman mock servers to test your routes before  using the real thing.
 
 ## 🚀 Project Structure
 
-Inside of your Astro project, you'll see the following folders and files:
+This project follows a fairly typical Astro setup. Components and pages are easy to find in their related folder, and the file endings indicate which framework is building the UI for that piece.
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+API endpoints are within the `pages/api` folder, allowing them to act as direct endpoints you can reach from the server or client side.
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+The `styles/index.css` file is a base reset borrowed directly from Josh Comeau.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
+The nanostore logic lives in `stores/teamStore.ts`.
 
 ## 🧞 Commands
 
