@@ -1,18 +1,14 @@
 <script setup>
-import { useStore } from "@nanostores/vue";
-import { $selectedTeams } from "../stores/teamStore";
-import GameCard from "./GameCard.vue";
 import { ref, computed, watch } from "vue";
+import { useStore } from "@nanostores/vue";
+import { $selectedTeams, $teamsList, $teamIds } from "../stores/teamStore";
+import GameCard from "./GameCard.vue";
 
-const props = defineProps(["teamsList", "range"]);
+const props = defineProps(["range"]);
 const selectedTeams = useStore($selectedTeams);
+const teamsList = useStore($teamsList);
+const teamIds = useStore($teamIds);
 const gamesList = ref({ games: [] });
-
-const teamIds = computed(() => {
-  return props.teamsList
-    .filter((team) => selectedTeams.value.includes(team.abbreviation))
-    .map((team) => team.id);
-});
 
 const gamesByDate = computed(() => {
   if (!gamesList.value.games || gamesList.value.games.length === 0) {
@@ -22,15 +18,10 @@ const gamesByDate = computed(() => {
   const groupedGames = {};
 
   gamesList.value.games.forEach((game) => {
-    // Use the date as the key for grouping
     const dateKey = game.date;
-
-    // Initialize the array for this date if it doesn't exist
     if (!groupedGames[dateKey]) {
       groupedGames[dateKey] = [];
     }
-
-    // Add the game to the appropriate date group
     groupedGames[dateKey].push(game);
   });
 
@@ -39,14 +30,14 @@ const gamesByDate = computed(() => {
 
 // Function to fetch schedule data
 async function fetchSchedule() {
-  if (teamIds.value.length === 0) {
+  if (teamIds.length === 0) {
     gamesList.value = { games: [] };
     return;
   }
 
   try {
     const schedule = await fetch(
-      `/api/getSchedule?teamIds=${teamIds.value}&dateRange=${props.range}`
+      `/api/getSchedule?dateRange=${props.range}`
     );
     gamesList.value = await schedule.json();
   } catch (error) {

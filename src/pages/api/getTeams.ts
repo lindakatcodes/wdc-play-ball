@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { BASE_URL, MOCK_URL } from "astro:env/server";
 
 interface TeamResponse {
   name: string;
@@ -11,9 +12,9 @@ interface ApiTeamResponse {
 }
 
 export const GET: APIRoute = async () => {
-  const teamsResponse = await fetch(
-    "https://fe1912ee-303a-4632-afe4-92071451c471.mock.pstmn.io/api/v1/teams?sportIds=1"
-  ).then((res) => res.json());
+  const teamsResponse = await fetch(`${MOCK_URL}/api/v1/teams?sportIds=1`).then(
+    (res) => res.json()
+  );
 
   const teamsList: TeamResponse[] = (
     teamsResponse as ApiTeamResponse

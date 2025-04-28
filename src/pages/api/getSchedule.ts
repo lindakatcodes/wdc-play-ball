@@ -1,13 +1,14 @@
-import type { APIContext } from "astro";
-import { parseJSON } from "date-fns";
+import type { APIRoute } from "astro";
 import { BASE_URL, MOCK_URL } from "astro:env/server";
+import { parseJSON } from "date-fns";
 
 type DateRange = "today" | "next7" | "previous7" | "upcoming" | "previous";
+type Status = "Final" | "Preview" | "Scheduled" | "Live";
 
 interface Game {
   gameDate: string;
   status: {
-    abstractGameState: string;
+    abstractGameState: Status;
   };
   teams: {
     away: {
@@ -38,14 +39,13 @@ interface TransformedGame {
   time: string;
   awayTeam: string;
   homeTeam: string;
-  gameStatus: string;
+  gameStatus: Status;
   awayScore: number | null;
   homeScore: number | null;
 }
 
-export const GET = async (context: APIContext): Promise<Response> => {
+export const GET: APIRoute = async ({ url }): Promise<Response> => {
   // Get query parameters
-  const url = context.url;
   const teamIds = url.searchParams.get("teamIds")?.split(",") || [];
   const dateRange = (url.searchParams.get("dateRange") || "today") as DateRange;
 
@@ -59,10 +59,10 @@ export const GET = async (context: APIContext): Promise<Response> => {
   );
 
   // Create a mapping of team IDs to abbreviations
-  const teamMap = new Map<number, string>();
+  const teamsMap = new Map<number, string>();
   teamsResponse.teamsList.forEach(
     (team: { id: number; abbreviation: string }) => {
-      teamMap.set(team.id, team.abbreviation);
+      teamsMap.set(team.id, team.abbreviation);
     }
   );
 
@@ -106,12 +106,10 @@ export const GET = async (context: APIContext): Promise<Response> => {
   // Add query parameters
   const queryParams = new URLSearchParams();
 
-  // Add team IDs if provided
   if (teamIds.length > 0) {
     queryParams.append("teamIds", teamIds.join(","));
   }
 
-  // Add date parameters if set
   if (startDate) {
     queryParams.append("startDate", formatDate(startDate));
   }
@@ -119,7 +117,6 @@ export const GET = async (context: APIContext): Promise<Response> => {
     queryParams.append("endDate", formatDate(endDate));
   }
 
-  // Add sport ID (assuming it's required like in the getTeams endpoint)
   queryParams.append("sportIds", "1");
 
   // Append query parameters to the URL
@@ -138,11 +135,6 @@ export const GET = async (context: APIContext): Promise<Response> => {
     });
 
     const games = scheduleData.dates.flatMap((gameDate) => {
-      // we're mapping over each gameDate, which is an array of objects
-      // each date will have an array of games objects
-      // we want to return a flat list of each game from all the dates with relevant info
-      // info: date, time, home team, away team, score, current status
-      // status can be Final, Preview, Scheduled, Live
       const totalGames: TransformedGame[] = [];
 
       gameDate.games.forEach((game: Game) => {
@@ -152,8 +144,8 @@ export const GET = async (context: APIContext): Promise<Response> => {
         const currentGame = {
           date: localDate,
           time: localTime,
-          awayTeam: teamMap.get(game.teams.away.team.id) || "",
-          homeTeam: teamMap.get(game.teams.home.team.id) || "",
+          awayTeam: teamsMap.get(game.teams.away.team.id) || "",
+          homeTeam: teamsMap.get(game.teams.home.team.id) || "",
           gameStatus: game.status.abstractGameState,
           awayScore:
             game.teams.away.score != null && game.teams.away.score >= 0

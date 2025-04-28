@@ -1,23 +1,18 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
-import TeamPicker from "../components/TeamPicker.vue";
-import { GET } from "./api/getTeams.ts";
 import GamesList from "../components/GamesList.vue";
-
-let teamsResponse = await GET(Astro);
-const teamsData = await teamsResponse.json();
-const teamsList = teamsData.teamsList;
+import TeamPicker from "../components/TeamPicker.vue";
+import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
 <BaseLayout>
-  <TeamPicker client:only="vue" teamsList={teamsList} />
+  <TeamPicker client:only="vue" />
   <h2>Today's Games</h2>
-  <GamesList client:only="vue" teamsList={teamsList} range="today" />
+  <GamesList client:only="vue" range="today" />
   <h2>Upcoming Games</h2>
-  <GamesList client:only="vue" teamsList={teamsList} range="next7" />
+  <GamesList client:only="vue" range="next7" />
   <a href="/future-games">See all upcoming games</a>
   <h2>Previous Games</h2>
-  <GamesList client:only="vue" teamsList={teamsList} range="prev7" />
+  <GamesList client:only="vue" range="prev7" />
   <a href="/past-games">See all past games</a>
 </BaseLayout>
 
