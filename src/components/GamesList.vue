@@ -1,13 +1,14 @@
 <script setup>
 import { ref, computed, watch } from "vue";
 import { useStore } from "@nanostores/vue";
-import { $selectedTeams, $teamsList, $teamIds } from "../stores/teamStore";
+import { $selectedTeams, $teamsList, $teamIds, $hasTeams } from "../stores/teamStore";
 import GameCard from "./GameCard.vue";
 
 const props = defineProps(["range"]);
 const selectedTeams = useStore($selectedTeams);
 const teamsList = useStore($teamsList);
 const teamIds = useStore($teamIds);
+const hasTeams = useStore($hasTeams);
 const gamesList = ref({ games: [] });
 
 const gamesByDate = computed(() => {
@@ -37,7 +38,7 @@ async function fetchSchedule() {
 
   try {
     const schedule = await fetch(
-      `/api/getSchedule?dateRange=${props.range}`
+      `/api/getSchedule?dateRange=${props.range}&teamIds=${teamIds.value.join(',')}`
     );
     gamesList.value = await schedule.json();
   } catch (error) {
@@ -45,16 +46,19 @@ async function fetchSchedule() {
   }
 }
 
-// Initial fetch
-await fetchSchedule();
+// Initial fetch needs to be in a watch to only be called once the hasTeams value is true, so we only make the call when we actually have the teams data which is used to compute our teamIds required by fetchSchedule
+watch(hasTeams, (hasTeams) => {
+  if (hasTeams) {
+    fetchSchedule();
+  }
+}, { immediate: true });
 
 // Watch for changes in teamIds and refetch data
 watch(
   teamIds,
   () => {
     fetchSchedule();
-  },
-  { deep: true }
+  }
 );
 </script>
 
