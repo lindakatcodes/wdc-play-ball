@@ -1,6 +1,5 @@
 import type { APIRoute } from "astro";
 import { BASE_URL, MOCK_URL } from "astro:env/server";
-import { parseJSON } from "date-fns";
 
 type DateRange = "today" | "next7" | "prev7" | "upcoming" | "previous";
 type Status = "Final" | "Preview" | "Scheduled" | "Live";
@@ -35,8 +34,7 @@ interface ScheduleData {
 }
 
 interface TransformedGame {
-  date: string;
-  time: string;
+  dateTime: string;
   awayTeam: string;
   homeTeam: string;
   gameStatus: Status;
@@ -140,12 +138,8 @@ export const GET: APIRoute = async ({ url }): Promise<Response> => {
       const totalGames: TransformedGame[] = [];
 
       gameDate.games.forEach((game: Game) => {
-        // Convert date and time from UTC to local time
-        const { localDate, localTime } = convertToLocalDateTime(game.gameDate);
-
         const currentGame = {
-          date: localDate,
-          time: localTime,
+          dateTime: game.gameDate,
           awayTeam: teamsMap.get(game.teams.away.team.id) || "",
           homeTeam: teamsMap.get(game.teams.home.team.id) || "",
           gameStatus: game.status.abstractGameState,
@@ -195,27 +189,4 @@ export const GET: APIRoute = async ({ url }): Promise<Response> => {
 // Helper function to format date as YYYY-MM-DD
 function formatDate(date: Date): string {
   return date.toISOString().split("T")[0];
-}
-
-// Helper function to convert UTC date and time to local date and time
-function convertToLocalDateTime(dateTimeStr: string): {
-  localDate: string;
-  localTime: string;
-} {
-  const dateObject = parseJSON(dateTimeStr);
-  const localDateStr = dateObject.toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-  });
-  const localTimeStr = dateObject.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
-
-  return {
-    localDate: localDateStr,
-    localTime: localTimeStr,
-  };
 }

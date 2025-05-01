@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, watch } from "vue";
 import { useStore } from "@nanostores/vue";
+import { parseJSON } from "date-fns";
 import { $selectedTeams, $teamsList, $teamIds, $hasTeams } from "../stores/teamStore";
 import GameCard from "./GameCard.vue";
 
@@ -57,10 +58,39 @@ async function fetchSchedule() {
     const schedule = await fetch(
       `/api/getSchedule?dateRange=${props.range}&teamIds=${teamIds.value.join(',')}`
     );
-    gamesList.value = await schedule.json();
+    // times have to be converted here on the client, so it uses the client's local time
+    const scheduleData = await schedule.json();
+    const gamesWithConvertedTimes = scheduleData.games.map(game => {
+      const { localDate, localTime } = convertToLocalDateTime(game.dateTime);
+      return {
+      ...game,
+      date: localDate,
+      time: localTime
+      };
+    });
+    gamesList.value = { games: gamesWithConvertedTimes };
   } catch (error) {
     console.error("Error fetching schedule:", error);
   }
+}
+
+function convertToLocalDateTime(dateTimeStr) {
+  const dateObject = parseJSON(dateTimeStr);
+  const localDateStr = dateObject.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+  const localTimeStr = dateObject.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  return {
+    localDate: localDateStr,
+    localTime: localTimeStr,
+  };
 }
 
 // Initial fetch needs to be in a watch to only be called once the hasTeams value is true, so we only make the call when we actually have the teams data which is used to compute our teamIds required by fetchSchedule
