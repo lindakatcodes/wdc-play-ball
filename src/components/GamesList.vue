@@ -1,19 +1,14 @@
 <script setup>
-import { ref, computed, watch } from "vue";
 import { useStore } from "@nanostores/vue";
 import { parseJSON } from "date-fns";
-import { $selectedTeams, $teamsList, $teamIds, $hasTeams } from "../stores/teamStore";
+import { computed, ref, watch } from "vue";
+import { $hasTeams, $teamIds } from "../stores/teamStore";
 import GameCard from "./GameCard.vue";
 
 const props = defineProps({
   range: String,
-  reverseOrder: {
-    type: Boolean,
-    default: false
-  }
+  reverseOrder: Boolean
 });
-const selectedTeams = useStore($selectedTeams);
-const teamsList = useStore($teamsList);
 const teamIds = useStore($teamIds);
 const hasTeams = useStore($hasTeams);
 const gamesList = ref({ games: [] });
